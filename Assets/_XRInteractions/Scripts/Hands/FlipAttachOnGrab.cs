@@ -29,7 +29,7 @@ namespace Feathersoft.XRI.Hands
             Transform attachTransform = args.interactableObject.GetAttachTransform(args.interactorObject);
 
             // Get the local pose from attach to base.
-            Pose localPose = attachTransform.InverseTransformPose(baseTransform.GetWorldPose());
+            Pose localPose = baseTransform.InverseTransformPose(attachTransform.GetWorldPose());
 
             // Mirror the local pose on the X axis.
             localPose.position.x *= -1; // flip local position
@@ -39,11 +39,10 @@ namespace Feathersoft.XRI.Hands
             axis.y *= -1;
             localPose.rotation = Quaternion.AngleAxis(angle, axis);
 
-            Pose newKeyPose = attachTransform.TransformPose(localPose);
-            Pose localNewKeyToAttach = newKeyPose.InverseTransformPose(attachTransform);
-            Pose newAttachPose = baseTransform.TransformPose(localNewKeyToAttach);
+            // Get the new world pose from base to attach
+            Pose newKeyPose = baseTransform.TransformPose(localPose);
 
-            args.interactableObject.GetAttachTransform(args.interactorObject).SetPositionAndRotation(newAttachPose.position, newAttachPose.rotation);
+            attachTransform.SetPositionAndRotation(newKeyPose.position, newKeyPose.rotation);
         }
     }
 }
